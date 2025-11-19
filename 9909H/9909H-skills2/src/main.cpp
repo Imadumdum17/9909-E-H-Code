@@ -2,6 +2,7 @@
 #include "liblvgl/llemu.hpp"
 #include "pros/imu.hpp"
 #include "lemlib/api.hpp" // IWYU pragma: keep
+#include "pros/misc.h"
 #include "pros/misc.hpp"
 
 //negative number means reversed motor
@@ -11,7 +12,7 @@ pros::MotorGroup right_mg({4, 5, 6}, pros::MotorGearset::blue); // right motors 
 pros::Imu imu(20);
 pros::Motor intake(-7);
 pros::Motor intake2(8);
-
+pros::Motor gyatt(18);
 pros::adi::Pneumatics tounge('A',false);
 pros::adi::Pneumatics scythe('B',false);
 
@@ -159,22 +160,25 @@ void opcontrol() {
 		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R1)) { intake2.move(127);}
         if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R2)) { intake2.move(-127);}
 
+        if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_UP)) { gyatt.move(127);}
+        if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_DOWN)) { gyatt.move(-127);}
+
         if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_L1)) { intake.move(127); toggle = false;}
         if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_L2)) { intake.move(-127); toggle = false;}
 		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A)) { tounge.toggle(); }
         if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_B)) { scythe.toggle(); }
         if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_LEFT)) { toggle = true; }
         
-        if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_DOWN)) { curve = !curve; }
+       
         //kill all ruiguan students i fucking hate them all
 
         if (not master.get_digital(pros::E_CONTROLLER_DIGITAL_R2) and not master.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) { intake2.brake(); }
         if (not master.get_digital(pros::E_CONTROLLER_DIGITAL_L2) and not master.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) { intake.brake(); }
 
+        if (not master.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN) and not master.get_digital(pros::E_CONTROLLER_DIGITAL_UP)) { gyatt.brake(); }
 
         if (toggle == true) {
-            intake.move(20);
-        }
+            intake.move(20);    }
         
 		//pros::lcd::print(4, "X: %f", chassis.getPose().x); // x
         //pros::lcd::print(5, "Y: %f", chassis.getPose().y); // y
