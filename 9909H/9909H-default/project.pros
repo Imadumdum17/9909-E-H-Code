@@ -635,7 +635,9 @@
       }
     },
     "upload_options": {
-      "icon": "X"
+      "icon": "X",
+      "description": "ima crash ",
+      "slot": 1
     },
     "use_early_access": false
   }
