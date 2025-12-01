@@ -45,19 +45,26 @@ void autonomous() {
     }
     else if (auton == 1) {
         //blue auton
+        pros::delay(1000);
         intake.move(20); //prevents blocks from going too far up
         intake2.move(127);
         chassis.setPose(0,0,90);
         chassis.moveToPoint(14.133, 0.533, 5000, {.maxSpeed=67, .minSpeed = 32});
         chassis.moveToPoint(22.666, 4.8, 5000, {.maxSpeed=67, .minSpeed = 32});
-        chassis.moveToPose(32.799, 0.267, 135 ,5000,{.maxSpeed=40, .minSpeed = 32});
-        chassis.moveToPose(46, -16, 135, 5000, {.maxSpeed=40, .minSpeed = 32});
-        pros::delay(800);
+        chassis.moveToPose(32.799, 0.267, 135 ,5000,{.maxSpeed=45, .minSpeed = 40});
+        chassis.moveToPose(46, -16, 135, 5000, {.maxSpeed=45, .minSpeed = 40});
+        pros::delay(900);
         tounge.extend();
-        pros::delay(1000);
+        pros::delay(1500);
         tounge.retract();
-        chassis.moveToPose(48.532, 5, 45, 5000); //REMEMBER TO SET MINSPEED
-        pros::delay(1000);
+        chassis.moveToPose(49, 5.5, 45, 5000); //REMEMBER TO SET MINSPEED
+        pros::delay(2500);
+        intake2.move(-127);
+        intake.move(-127);
+        pros::delay(2500);
+        intake2.move(127);
+        intake.move(127);
+        pros::delay(500);
         intake2.move(-127);
         intake.move(-127);
 

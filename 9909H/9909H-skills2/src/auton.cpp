@@ -45,9 +45,10 @@ void autonomous() {
     }
     else if (auton == 1) {
         //blue auton
-        chassis.moveToPoint(0, 0, 5000);
-        chassis.moveToPoint(20.37, 64.705, 5000);
-        chassis.moveToPoint(0.599, 23.366, 5000);
+        chassis.setPose(0, 0, 180);
+        chassis.moveToPoint(20.37, 64.705, 5000, {.forwards = false});
+        scythe.extend();
+        chassis.moveToPoint(0.599, 23.366, 5000, {.forwards = false});
 
         //pros::delay(1500);
         //chassis.turnToHeading(90, 5000, {lemlib::AngularDirection::CW_CLOCKWISE});

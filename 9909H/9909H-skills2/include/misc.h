@@ -12,6 +12,7 @@ extern pros::Imu imu;
 extern pros::Motor intake;
 extern pros::Motor intake2;
 extern pros::adi::Pneumatics tounge;
+extern pros::adi::Pneumatics scythe;
 extern lemlib::Drivetrain drivetrain;
 extern lemlib::OdomSensors sensors;
 extern lemlib::ControllerSettings lateral_controller;
