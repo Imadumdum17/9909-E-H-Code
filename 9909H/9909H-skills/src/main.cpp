@@ -8,6 +8,7 @@
 pros::Controller master(pros::E_CONTROLLER_MASTER);
 pros::MotorGroup left_mg({-1, -2, -3}, pros::MotorGearset::blue); // left motors on ports 1, 2, 3
 pros::MotorGroup right_mg({4, 5, 6}, pros::MotorGearset::blue); // right motors on ports 4, 5, 6
+pros::MotorGroup dt({-1, -2, -3, 4, 5, 6}, pros::MotorGearset::blue); // right motors on ports 4, 5, 6
 pros::Imu imu(20);
 pros::Motor intake(-7);
 pros::Motor intake2(8);
@@ -39,23 +40,23 @@ lemlib::OdomSensors sensors(nullptr, // vertical tracking wheel 1
 lemlib::ControllerSettings lateral_controller(10, // proportional gain (kP)
                                               1, // integral gain (kI)
                                               3, // derivative gain (kD)
-                                              3, // anti windup
-                                              1, // small error range, in inches
-                                              100, // small error range timeout, in milliseconds
-                                              3, // large error range, in inches
-                                              500, // large error range timeout, in milliseconds
+                                              4, // anti windup
+                                              0.5, // small error range, in inches
+                                              200, // small error range timeout, in milliseconds
+                                              1, // large error range, in inches
+                                              600, // large error range timeout, in milliseconds
                                               20 // maximum acceleration (slew)
 );
 
 //i am going to fucking kill myself
 // angular PID controller
 lemlib::ControllerSettings angular_controller(2, // proportional gain (kP)
-                                              0, // integral gain (kI)
+                                              2, // integral gain (kI) 0
                                               10, // derivative gain (kD)
-                                              3, // anti windup 3
+                                              2, // anti windup 3
                                               1, // small error range, in degrees 1
                                               100, // small error range timeout, in milliseconds 100
-                                              3, // large error range, in degrees 3
+                                              2, // large error range, in degrees 3
                                               500, // large error range timeout, in milliseconds 500
                                               0 // maximum acceleration (slew) 0
 );

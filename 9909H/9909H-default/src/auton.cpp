@@ -45,28 +45,39 @@ void autonomous() {
     }
     else if (auton == 1) {
         //blue auton
-        pros::delay(1000);
+
+        //chassis.turnToHeading(90, 100000);
+
+        // - CURENT AUTO -
         intake.move(20); //prevents blocks from going too far up
         intake2.move(127);
         chassis.setPose(0,0,90);
-        chassis.moveToPoint(14.133, 0.533, 5000, {.maxSpeed=67, .minSpeed = 32});
-        chassis.moveToPoint(22.666, 4.8, 5000, {.maxSpeed=67, .minSpeed = 32});
-        chassis.moveToPose(32.799, 0.267, 135 ,5000,{.maxSpeed=45, .minSpeed = 40});
-        chassis.moveToPose(46, -16, 135, 5000, {.maxSpeed=45, .minSpeed = 40});
-        pros::delay(900);
+        chassis.moveToPoint(14.133, 0.533, 5000, {.maxSpeed=80, .minSpeed = 32});
+        chassis.moveToPoint(14.133, 0.533, 5000, {.maxSpeed=80, .minSpeed = 32});
+        chassis.moveToPoint(25.666, 0.2, 5000, {.maxSpeed=80, .minSpeed = 32});
+        chassis.moveToPose(32.799, 0.267, 135 ,5000,{.maxSpeed=80, .minSpeed = 40});
+        chassis.moveToPoint(38.5, -10, 5000, {.maxSpeed=80, .minSpeed = 40});
+        pros::delay(500);
         tounge.extend();
         pros::delay(1500);
         tounge.retract();
-        chassis.moveToPose(49, 5.5, 45, 5000); //REMEMBER TO SET MINSPEED
-        pros::delay(2500);
-        intake2.move(-127);
+        chassis.moveToPoint(36.5, -8, 5000, {.forwards = false, .maxSpeed=80, .minSpeed = 40});
+        chassis.moveToPose(48, 5, 45, 5000);
+        pros::delay(1000);
+        intake2.move(-127);      
         intake.move(-127);
-        pros::delay(2500);
-        intake2.move(127);
-        intake.move(127);
-        pros::delay(500);
-        intake2.move(-127);
-        intake.move(-127);
+
+
+        // chassis.moveToPose(51, 5, 45, 5000); //REMEMBER TO SET MINSPEED
+        // pros::delay(2500);
+        // intake2.move(-127);      
+        // intake.move(-127);
+        // pros::delay(4500);
+        // intake2.move(127);
+        // intake.move(127);
+        // pros::delay(500);
+        // intake2.move(-127);
+        // intake.move(-127);
 
         //pros::delay(1500);
         //chassis.turnToHeading(90, 5000, {lemlib::AngularDirection::CW_CLOCKWISE});

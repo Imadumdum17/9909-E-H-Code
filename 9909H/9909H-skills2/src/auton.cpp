@@ -45,10 +45,10 @@ void autonomous() {
     }
     else if (auton == 1) {
         //blue auton
-        chassis.setPose(0, 0, 180);
-        chassis.moveToPoint(20.37, 64.705, 5000, {.forwards = false});
-        scythe.extend();
-        chassis.moveToPoint(0.599, 23.366, 5000, {.forwards = false});
+       // chassis.setPose(0, 0, 180);
+        //chassis.moveToPoint(20.37, 64.705, 5000, {.forwards = false});
+        //scythe.extend();
+        //chassis.moveToPoint(0.599, 23.366, 5000, {.forwards = false});
 
         //pros::delay(1500);
         //chassis.turnToHeading(90, 5000, {lemlib::AngularDirection::CW_CLOCKWISE});
@@ -61,4 +61,43 @@ void autonomous() {
     //    intake.move(-127); //score midgoal
         // a/b = 15.5
     }
+    //45 Auton Skills
+//    scythe.extend();
+//    chassis.setPose(0, 0, 0);
+//     chassis.moveToPoint(1.039, -42.658, 5000, {.forwards = false});
+//     chassis.moveToPoint(31.101, -48.503, 5000);
+//     chassis.moveToPoint(0.204, -66.039, 5000);
+//     chassis.moveToPoint(30.544, -76.059, 5000);
+//     chassis.moveToPoint(107.368, -72.998, 5000);
+//     chassis.moveToPoint(124.904, -66.874, 5000);
+//     chassis.moveToPoint(123.225, 10.953, 5000);
+//     chassis.moveToPoint(125.173, 29.046, 5000);
+//     chassis.moveToPoint(109.864, 43.52, 5000);
+//     chassis.moveToPoint(33.959, 42.587, 5000);
+//     chassis.moveToPoint(22.463, 32.665, 5000);
+//     chassis.moveToPoint(-0.918, 27.376, 5000);
+//     chassis.moveToPoint(9.381, 12.345, 5000);
+//     chassis.moveToPoint(3.619, 4.454, 5000);
+//     chassis.moveToPoint(-0.557, -15.866, 5000);
+
+
+
+
+//Auton skills 20 point
+left_mg.move(-127) && right_mg.move(-127);
+pros::delay(1000);
+left_mg.brake() && right_mg.brake();
+left_mg.move(127) && right_mg.move(127);
+pros::delay(1000);
+left_mg.brake() && right_mg.brake();
+
+
+//Auton Skills PATH CODE 20 Point
+
+chassis.setPose(0, 0, 5000);
+chassis.moveToPoint(0.536, -36.71, 5000, {.forwards = false});
+chassis.moveToPoint(26.528, -46.625, 5000, {.forwards = false});
+chassis.moveToPoint(32.155, -31.887, 5000, {.forwards = false});
+chassis.moveToPoint(25.992, -16.613, 5000, {.forwards = false});
+chassis.moveToPoint(0.804, -17.685, 5000, {.forwards = false});
 }

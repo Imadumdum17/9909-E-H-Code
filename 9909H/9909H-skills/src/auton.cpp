@@ -44,8 +44,51 @@ void autonomous() {
 
     }
     else if (auton == 1) {
+    chassis.setPose(0, 0, 0);
+    //chassis.moveToPoint(0, -16, 5000, {.forwards = true});
+    // chassis.moveToPoint(0, 38.05, 5000, {.forwards = false, .maxSpeed = 89});
+    // chassis.moveToPoint(13.13, 50.108, 5000, {.forwards = false});
+    intake.move(127);
+    intake2.move(127);
+    chassis.moveToPose(18, 32, 270, 2000);
+    tounge.extend();
+    chassis.moveToPose(-6, 32, 270, 5000, {.minSpeed = 50});
+    scythe.extend();
+    pros::delay(1000);
+    chassis.moveToPose(0, 32, 270, 5000, {.forwards = false, .minSpeed = 50});
+    pros::delay(500);
+    chassis.moveToPose(-6, 32, 270, 5000, {.minSpeed = 50});
+    pros::delay(1000);
+    chassis.moveToPose(0, 32, 270, 5000, {.forwards = false, .minSpeed = 50});
+    pros::delay(500);
+    chassis.moveToPose(-6, 32, 270, 5000, {.minSpeed = 50});
+    pros::delay(5000);
+    chassis.moveToPose(-14, -12, 0, 5000, {.forwards = false, .minSpeed = 80});
+    chassis.moveToPose(-14, -21, 0, 5000, {.forwards = false, .minSpeed = 80});
+    tounge.retract();
+    // chassis.moveToPose(24, 32.5, 270, 5000);
+    //chassis.moveToPose(-8.378, 68, 270, 5000,{.forwards = true, .minSpeed = 67});
+    // pros::delay(1000);
+    // // dt.move(127);
+    // pros::delay(1500);
+    // intake.brake();
+    // pros::delay(1000);
+    // // dt.move(-127);
+    // pros::delay(100);
+    // // dt.move(127);
+    // pros::delay(1500);
+    // dt.brake();
+    // chassis.moveToPose(-28 ,60, 270, 5000, {.forwards = false, .maxSpeed = 67, .minSpeed = 67});
+    // pros::delay(500);
+    // intake.move(67);
+    // pros::delay(1500);
+    // chassis.moveToPose(-20 ,20, 360, 5000, {.forwards = true, .maxSpeed = 67, .minSpeed = 67});
+
+    //1.1s front>back
+
+    // chassis.moveToPose(-24.378, 67.5, 270, 5000,{.forwards = true, .minSpeed = 67});
+    // chassis.moveToPose(-16.378, 67.5, 270, 5000,{.minSpeed = 67});
         //blue auton
-        intake.move(20); //prevents blocks from going too far up
         //pros::delay(1500);
         //chassis.turnToHeading(90, 5000, {lemlib::AngularDirection::CW_CLOCKWISE});
         //pros::delay(1500);
