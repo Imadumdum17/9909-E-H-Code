@@ -1,6 +1,6 @@
 #include "misc.h"
 #include "main.h"
-#include "lemlib/api.hpp" // IWYU pragma: keep
+#include "lemlib/api.hpp"  // IWYU pragma: keep
 #include "pros/rtos.hpp"
 
 //drivetrain is 14.5 x 18 for some dumbass reason
@@ -44,28 +44,15 @@ void autonomous() {
 
     }
     else if (auton == 1) {
-    chassis.setPose(0, 0, 0);
-    //chassis.moveToPoint(0, -16, 5000, {.forwards = true});
-    // chassis.moveToPoint(0, 38.05, 5000, {.forwards = false, .maxSpeed = 89});
-    // chassis.moveToPoint(13.13, 50.108, 5000, {.forwards = false});
-    intake.move(127);
-    intake2.move(127);
-    chassis.moveToPose(18, 32, 270, 2000);
-    tounge.extend();
-    chassis.moveToPose(-6, 32, 270, 5000, {.minSpeed = 50});
-    scythe.extend();
-    pros::delay(1000);
-    chassis.moveToPose(0, 32, 270, 5000, {.forwards = false, .minSpeed = 50});
-    pros::delay(500);
-    chassis.moveToPose(-6, 32, 270, 5000, {.minSpeed = 50});
-    pros::delay(1000);
-    chassis.moveToPose(0, 32, 270, 5000, {.forwards = false, .minSpeed = 50});
-    pros::delay(500);
-    chassis.moveToPose(-6, 32, 270, 5000, {.minSpeed = 50});
-    pros::delay(5000);
-    chassis.moveToPose(-14, -12, 0, 5000, {.forwards = false, .minSpeed = 80});
-    chassis.moveToPose(-14, -21, 0, 5000, {.forwards = false, .minSpeed = 80});
-    tounge.retract();
+
+// +y::forward
+// +x::right
+// 0t::front-facing
+// 90t::right-facing
+
+        chassis.setPose(0, 0, 0);
+        chassis.moveToPose(11.2, 24, 45, 5000);
+
     // chassis.moveToPose(24, 32.5, 270, 5000);
     //chassis.moveToPose(-8.378, 68, 270, 5000,{.forwards = true, .minSpeed = 67});
     // pros::delay(1000);
@@ -101,3 +88,23 @@ void autonomous() {
         // a/b = 15.5
     }
 }
+
+    // chassis.setPose(0, 0, 0);
+    // intake.move(127);
+    // intake2.move(127);
+    // chassis.moveToPose(18, 32, 270, 2000);
+    // tounge.extend();
+    // chassis.moveToPose(-6, 32, 270, 5000, {.minSpeed = 50});
+    // scythe.extend();
+    // pros::delay(1000);
+    // chassis.moveToPose(0, 32, 270, 5000, {.forwards = false, .minSpeed = 50});
+    // pros::delay(500);
+    // chassis.moveToPose(-6, 32, 270, 5000, {.minSpeed = 50});
+    // pros::delay(1000);
+    // chassis.moveToPose(0, 32, 270, 5000, {.forwards = false, .minSpeed = 50});
+    // pros::delay(500);
+    // chassis.moveToPose(-6, 32, 270, 5000, {.minSpeed = 50});
+    // pros::delay(5000);
+    // chassis.moveToPose(-14, -12, 0, 5000, {.forwards = false, .minSpeed = 100});
+    // chassis.moveToPose(-14, -21, 0, 5000, {.forwards = false, .minSpeed = 120});
+    // tounge.retract();

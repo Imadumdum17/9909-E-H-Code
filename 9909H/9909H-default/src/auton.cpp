@@ -46,7 +46,10 @@ void autonomous() {
     else if (auton == 1) {
         //blue auton
 
-        //chassis.turnToHeading(90, 100000);
+        // chassis.moveToPoint(0, 24, 1000);/'[=i]
+        // chassis.turnToHeading(180, 1000);
+        // chassis.moveToPose(0, 24, 180, 1000);
+
 
         // - CURENT AUTO -
         intake.move(20); //prevents blocks from going too far up
@@ -55,14 +58,13 @@ void autonomous() {
         chassis.moveToPoint(14.133, 0.533, 5000, {.maxSpeed=80, .minSpeed = 32});
         chassis.moveToPoint(14.133, 0.533, 5000, {.maxSpeed=80, .minSpeed = 32});
         chassis.moveToPoint(25.666, 0.2, 5000, {.maxSpeed=80, .minSpeed = 32});
-        chassis.moveToPose(32.799, 0.267, 135 ,5000,{.maxSpeed=80, .minSpeed = 40});
-        chassis.moveToPoint(38.5, -10, 5000, {.maxSpeed=80, .minSpeed = 40});
-        pros::delay(500);
+        chassis.moveToPoint(32.799, 0 ,5000,{.maxSpeed=80, .minSpeed = 40});
+        chassis.moveToPoint(39.5, -2.5, 5000, {.maxSpeed=80, .minSpeed = 40});
         tounge.extend();
         pros::delay(1500);
         tounge.retract();
         chassis.moveToPoint(36.5, -8, 5000, {.forwards = false, .maxSpeed=80, .minSpeed = 40});
-        chassis.moveToPose(48, 5, 45, 5000);
+        chassis.moveToPose(51.5, 2.5, 45, 5000);
         pros::delay(1000);
         intake2.move(-127);      
         intake.move(-127);

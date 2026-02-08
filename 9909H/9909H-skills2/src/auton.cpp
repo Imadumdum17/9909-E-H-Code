@@ -14,6 +14,9 @@ void motors() { //unused
 }
 
 void autonomous() {
+
+    chassis.moveToPoint(0, 23, 1000);
+    chassis.moveToPoint(0, -18, 1000, {false});
     //pros::Task autointake(motors);
     if (auton == 0) {
         //red auton
@@ -84,20 +87,20 @@ void autonomous() {
 
 
 //Auton skills 20 point
-left_mg.move(-127) && right_mg.move(-127);
-pros::delay(1000);
-left_mg.brake() && right_mg.brake();
-left_mg.move(127) && right_mg.move(127);
-pros::delay(1000);
-left_mg.brake() && right_mg.brake();
+// left_mg.move(-127) && right_mg.move(-127);
+// pros::delay(1000);
+// left_mg.brake() && right_mg.brake();
+// left_mg.move(127) && right_mg.move(127);
+// pros::delay(1000);
+// left_mg.brake() && right_mg.brake();
 
 
-//Auton Skills PATH CODE 20 Point
+// //Auton Skills PATH CODE 20 Point
 
-chassis.setPose(0, 0, 5000);
-chassis.moveToPoint(0.536, -36.71, 5000, {.forwards = false});
-chassis.moveToPoint(26.528, -46.625, 5000, {.forwards = false});
-chassis.moveToPoint(32.155, -31.887, 5000, {.forwards = false});
-chassis.moveToPoint(25.992, -16.613, 5000, {.forwards = false});
-chassis.moveToPoint(0.804, -17.685, 5000, {.forwards = false});
+// chassis.setPose(0, 0, 5000);
+// chassis.moveToPoint(0.536, -36.71, 5000, {.forwards = false});
+// chassis.moveToPoint(26.528, -46.625, 5000, {.forwards = false});
+// chassis.moveToPoint(32.155, -31.887, 5000, {.forwards = false});
+// chassis.moveToPoint(25.992, -16.613, 5000, {.forwards = false});
+// chassis.moveToPoint(0.804, -17.685, 5000, {.forwards = false});
 }
