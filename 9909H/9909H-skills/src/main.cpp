@@ -61,10 +61,10 @@ lemlib::ControllerSettings angular_controller(3.5, // proportional gain (kP) [10
                                               0 // maximum acceleration (slew) 0
 );
 
-// create the chassis as a pointer so it can be replaced at runtime
+// create the chassis as pointer for runtime replacement
 lemlib::Chassis* chassis = nullptr;
 
-// (re)create the chassis with current controller settings
+// (re)create the chassis with current PID values
 static pros::Mutex chassis_mutex;
 void applyControllerSettings() {
     chassis_mutex.take();
@@ -83,45 +83,10 @@ int auton = 1;
 int start = 0;
 int uptime = 1;
 
+bool debugPage = true;
+bool updateRequired = false;
 
-/**
- * A callback function for LLEMU's center button.
- *
- * When this callback is fired, it will toggle line 2 of the LCD text between
- * "I was pressed!" and nothing.
- */
-void on_center_button() {
-	/*static bool pressed = false;
-	pressed = !pressed;
-	if (pressed) {
-		pros::lcd::set_text(0, "curvature");
-        drive = 1;
-	} else {
-		pros::lcd::set_text(0, "tank");
-        drive = 0;
-	} */
-}
 
-void on_right_button() {
-    static bool pressed2 = false;
-    pressed2 = !pressed2;
-    if (pressed2) {
-        pros::lcd::set_text(1, "blue auton");
-        auton = 1;
-    } else {
-        pros::lcd::set_text(1, "red auton");
-        auton = 0;
-    }    
-}
-
-void on_left_button() {
-    start = 1;
-}
-/**
- * Runs initialization code. This occurs as soon as the program is started.
- * All other competition modes are blocked by initialize; it is recommended
- * to keep execution time for this mode under a few seconds.
- */
 void initialize() {
     // create chassis with current settings
     applyControllerSettings();
@@ -129,47 +94,40 @@ void initialize() {
     if (chassis) chassis->calibrate();
     chassis_mutex.give();
 	pros::lcd::initialize();
-	pros::lcd::set_text(0, "curvature");
-    pros::lcd::set_text(1, "red auton");
 
-    pros::lcd::register_btn0_cb(on_left_button);
-	// pros::lcd::register_btn1_cb(on_center_button);
-    pros::lcd::register_btn2_cb(on_right_button);
+//create a task to not starve main thread of resources
     pros::Task screen_task([&]() {
         while (true) {
             // print robot location to the brain screen
             chassis_mutex.take();
             if (chassis) {
                 auto p = chassis->getPose();
-                pros::lcd::print(0, "X: %f", p.x); // x
-                pros::lcd::print(1, "Y: %f", p.y); // y
+                pros::lcd::print(0, "X: %f", p.x); // x pos
+                pros::lcd::print(1, "Y: %f", p.y); // y pos
                 pros::lcd::print(2, "Theta: %f", p.theta); // heading
+                if (debugPage) { // print PID values on two pages due to screen space constraints
+                    pros::lcd::print(4, "lateral kP: %f", lateral_controller.kP); //lateral kP
+                    pros::lcd::print(5, "lateral kI: %f", lateral_controller.kI); //lateral kI
+                    pros::lcd::print(6, "lateral kD: %f", lateral_controller.kD); //lateral kD
+                } else {
+                    pros::lcd::print(4, "angular kP: %f", angular_controller.kP); //angualar kP
+                    pros::lcd::print(5, "angular kI: %f", angular_controller.kI); //angualar kI
+                    pros::lcd::print(6, "angular kD: %f", angular_controller.kD); //angualar kD
+                }
+
+                if (updateRequired) { //detect if PID values have been changed and are not yet applied
+                    pros::lcd::set_text(8, "Update required");
+                } else {
+                    pros::lcd::clear_line(8);
+                }
             }
             chassis_mutex.give();
             // pros::lcd::print(4, "Rotation Sensor: %i", horizontalencoder.get_position());
             // delay to save resources
-            pros::delay(20);
+            pros::delay(100);
         }
     });
 }
-
-/**
- * Runs while the robot is in the disabled state of Field Management System or
- * the VEX Competition Switch, following either autonomous or opcontrol. When
- * the robot is enabled, this task will exit.
- */
-void disabled() {}
-
-/**
- * Runs after initialize(), and before autonomous when connected to the Field
- * Management System or the VEX Competition Switch. This is intended for
- * competition-specific initialization routines, such as an autonomous selector
- * on the LCD.
- *
- * This task will exit when the robot is enabled and autonomous or opcontrol
- * starts.
- */
-void competition_initialize() {}
 
 
 void opcontrol() {
@@ -201,56 +159,57 @@ void opcontrol() {
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-        if (rightHeld and master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R2)) {
+        if (rightHeld and !xHeld and master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R2)) {
             chassis_mutex.take();
             if (chassis) chassis->setPose(0, 0, 0);
             chassis_mutex.give();
             if (chassis) chassis->moveToPose(0, 24, 0, 5000);
         }
-
-        if (rightHeld and master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R2)) {
+        if (rightHeld and !xHeld and master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R2)) {
             chassis_mutex.take();
             if (chassis) chassis->setPose(0, 0, 0);
             chassis_mutex.give();
             // if (chassis) chassis->moveToPose(0, 24, 0, 5000);
         }
 
-        if (rightHeld and master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R2)) {
+        if (rightHeld and !xHeld and master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R2)) {
             chassis_mutex.take();
+            if (chassis) chassis->cancelAllMotions();
             if (chassis) chassis->setPose(0, 0, 0);
             chassis_mutex.give();
             // if (chassis) chassis->moveToPose(0, 24, 0, 5000);
         }
 
-        if (rightHeld and master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R2)) {
+        if (rightHeld and !xHeld and master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R2)) {
             chassis_mutex.take();
+            if (chassis) chassis->cancelAllMotions();
             if (chassis) chassis->setPose(0, 0, 0);
             chassis_mutex.give();
             // if (chassis) chassis->moveToPose(0, 0, 0, 5000);
         }
 
-        if (leftHeld and master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R2)) {
+        if (leftHeld and !xHeld and master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R2)) {
             chassis_mutex.take();
             if (chassis) chassis->setPose(0, 0, 0);
             chassis_mutex.give();
             if (chassis) chassis->turnToHeading(90, 5000);
         }
 
-        if (leftHeld and master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R2)) {
+        if (leftHeld and !xHeld and master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R2)) {
             chassis_mutex.take();
             if (chassis) chassis->setPose(0, 0, 0);
             chassis_mutex.give();
             // if (chassis) chassis->turnToHeading(90, 5000);
         }
 
-        if (leftHeld and master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R2)) {
+        if (leftHeld and !xHeld and master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R2)) {
             chassis_mutex.take();
             if (chassis) chassis->setPose(0, 0, 0);
             chassis_mutex.give();
             // if (chassis) chassis->turnToHeading(90, 5000);
         }
 
-        if (leftHeld and master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R2)) {
+        if (leftHeld and !xHeld and master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R2)) {
             chassis_mutex.take();
             if (chassis) chassis->setPose(0, 0, 0);
             chassis_mutex.give();
@@ -260,166 +219,176 @@ void opcontrol() {
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
         if (xHeld and !aHeld and !yHeld and !l2Held and !r2Held) {
-            if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R1)) {
+            if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_UP)) {
                 angular_controller.kP += 1.0f;
-                applyControllerSettings();
-                pros::lcd::set_text(4, "angular kP +1");
+                updateRequired = true;
+                pros::lcd::set_text(9, "angular kP +1");
             }
-            if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R2)) {
+            if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_DOWN)) {
                 angular_controller.kP -= 1.0f;
-                applyControllerSettings();
-                pros::lcd::set_text(4, "angular kP -1");
+                updateRequired = true;
+                pros::lcd::set_text(9, "angular kP -1");
             }
         }
 
         if (xHeld and aHeld and !yHeld and !l2Held and !r2Held) {
-            if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R1)) {
+            if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_UP)) {
                 lateral_controller.kP += 1.0f;
-                applyControllerSettings();
-                pros::lcd::set_text(4, "lateral kP +1");
+                updateRequired = true;
+                pros::lcd::set_text(9, "lateral kP +1");
             }
-            if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R2)) {
+            if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_DOWN)) {
                 lateral_controller.kP -= 1.0f;
-                applyControllerSettings();
-                pros::lcd::set_text(4, "lateral kP -1");
+                updateRequired = true;
+                pros::lcd::set_text(9, "lateral kP -1");
             }
         }
 
         
         if (xHeld and !aHeld and yHeld and !l2Held and !r2Held) {
-            if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R1)) {
+            if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_UP)) {
                 angular_controller.kP += 0.1f;
-                applyControllerSettings();
-                pros::lcd::set_text(4, "angular kP +0.1");
+                updateRequired = true;
+                pros::lcd::set_text(9, "angular kP +0.1");
             }
-            if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R2)) {
+            if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_DOWN)) {
                 angular_controller.kP -= 0.1f;
-                applyControllerSettings();
-                pros::lcd::set_text(4, "angular kP -0.1");
+                updateRequired = true;
+                pros::lcd::set_text(9, "angular kP -0.1");
             }
         }
 
         if (xHeld and aHeld and yHeld and !l2Held and !r2Held) {
-            if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R1)) {
+            if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_UP)) {
                 lateral_controller.kP += 0.1f;
-                applyControllerSettings();
-                pros::lcd::set_text(4, "lateral kP +0.1");
+                updateRequired = true;
+                pros::lcd::set_text(9, "lateral kP +0.1");
             }
-            if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R2)) {
+            if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_DOWN)) {
                 lateral_controller.kP -= 0.1f;
-                applyControllerSettings();
-                pros::lcd::set_text(4, "lateral kP -0.1");
+                updateRequired = true;
+                pros::lcd::set_text(9, "lateral kP -0.1");
             }
         }
 
 
         if (xHeld and !aHeld and !yHeld and !l2Held and r2Held) {
-            if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R1)) {
+            if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_UP)) {
                 angular_controller.kD += 1.0f;
-                applyControllerSettings();
-                pros::lcd::set_text(4, "angular kD +1");
+                updateRequired = true;
+                pros::lcd::set_text(9, "angular kD +1");
             }
-            if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R2)) {
+            if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_DOWN)) {
                 angular_controller.kD -= 1.0f;
-                applyControllerSettings();
-                pros::lcd::set_text(4, "angular kD -1");
+                updateRequired = true;
+                pros::lcd::set_text(9, "angular kD -1");
             }
         }
 
         if (xHeld and aHeld and !yHeld and !l2Held and r2Held) {
-            if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R1)) {
+            if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_UP)) {
                 lateral_controller.kD += 1.0f;
-                applyControllerSettings();
-                pros::lcd::set_text(4, "lateral kD +1");
+                updateRequired = true;
+                pros::lcd::set_text(9, "lateral kD +1");
             }
-            if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R2)) {
+            if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_DOWN)) {
                 lateral_controller.kD -= 1.0f;
-                applyControllerSettings();
-                pros::lcd::set_text(4, "lateral kD -1");
+                updateRequired = true;
+                pros::lcd::set_text(9, "lateral kD -1");
             }
         }
 
         
         if (xHeld and !aHeld and yHeld and !l2Held and r2Held) {
-            if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R1)) {
+            if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_UP)) {
                 angular_controller.kD += 0.1f;
-                applyControllerSettings();
-                pros::lcd::set_text(4, "angular kD +0.1");
+                updateRequired = true;
+                pros::lcd::set_text(9, "angular kD +0.1");
             }
-            if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R2)) {
+            if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_DOWN)) {
                 angular_controller.kD -= 0.1f;
-                applyControllerSettings();
-                pros::lcd::set_text(4, "angular kD -0.1");
+                updateRequired = true;
+                pros::lcd::set_text(9, "angular kD -0.1");
             }
         }
 
         if (xHeld and aHeld and yHeld and !l2Held and r2Held) {
-            if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R1)) {
+            if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_UP)) {
                 lateral_controller.kD += 0.1f;
-                applyControllerSettings();
-                pros::lcd::set_text(4, "lateral kD +0.1");
+                updateRequired = true;
+                pros::lcd::set_text(9, "lateral kD +0.1");
             }
-            if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R2)) {
+            if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_DOWN)) {
                 lateral_controller.kD -= 0.1f;
-                applyControllerSettings();
-                pros::lcd::set_text(4, "lateral kD -0.1");
+                updateRequired = true;
+                pros::lcd::set_text(9, "lateral kD -0.1");
             }
         }
 
 
         if (xHeld and !aHeld and !yHeld and l2Held and !r2Held) {
-            if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R1)) {
+            if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_UP)) {
                 angular_controller.kI += 1.0f;
-                applyControllerSettings();
-                pros::lcd::set_text(4, "angular kI +1");
+                updateRequired = true;
+                pros::lcd::set_text(9, "angular kI +1");
             }
-            if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R2)) {
+            if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_DOWN)) {
                 angular_controller.kI -= 1.0f;
-                applyControllerSettings();
-                pros::lcd::set_text(4, "angular kI -1");
+                updateRequired = true;
+                pros::lcd::set_text(9, "angular kI -1");
             }
         }
 
         if (xHeld and aHeld and !yHeld and l2Held and !r2Held) {
-            if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R1)) {
+            if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_UP)) {
                 lateral_controller.kI += 1.0f;
-                applyControllerSettings();
-                pros::lcd::set_text(4, "lateral kI +1");
+                updateRequired = true;
+                pros::lcd::set_text(9, "lateral kI +1");
             }
-            if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R2)) {
+            if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_DOWN)) {
                 lateral_controller.kI -= 1.0f;
-                applyControllerSettings();
-                pros::lcd::set_text(4, "lateral kI -1");
+                updateRequired = true;
+                pros::lcd::set_text(9, "lateral kI -1");
             }
         }
 
         
         if (xHeld and !aHeld and yHeld and l2Held and !r2Held) {
-            if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R1)) {
+            if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_UP)) {
                 angular_controller.kI += 0.1f;
-                applyControllerSettings();
-                pros::lcd::set_text(4, "angular kI +0.1");
+                updateRequired = true;
+                pros::lcd::set_text(9, "angular kI +0.1");
             }
-            if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R2)) {
+            if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_DOWN)) {
                 angular_controller.kI -= 0.1f;
-                applyControllerSettings();
-                pros::lcd::set_text(4, "angular kI -0.1");
+                updateRequired = true;
+                pros::lcd::set_text(9, "angular kI -0.1");
             }
         }
 
         if (xHeld and aHeld and yHeld and l2Held and !r2Held) {
-            if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R1)) {
+            if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_UP)) {
                 lateral_controller.kI += 0.1f;
-                applyControllerSettings();
-                pros::lcd::set_text(4, "lateral kI +0.1");
+                updateRequired = true;
+                pros::lcd::set_text(9, "lateral kI +0.1");
             }
-            if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R2)) {
+            if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_DOWN)) {
                 lateral_controller.kI -= 0.1f;
-                applyControllerSettings();
-                pros::lcd::set_text(4, "lateral kI -0.1");
+                updateRequired = true;
+                pros::lcd::set_text(9, "lateral kI -0.1");
             }
         }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+        if (xHeld and master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_B)) {
+            applyControllerSettings();
+            updateRequired = false;
+        }
+
+        
+        if (xHeld and master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_RIGHT)) {
+            debugPage = !debugPage;
+        }
 
         if (not master.get_digital(pros::E_CONTROLLER_DIGITAL_R2) and not master.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) { intake2.brake(); }
         if (not master.get_digital(pros::E_CONTROLLER_DIGITAL_L2) and not master.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) { intake.brake(); }
@@ -428,14 +397,6 @@ void opcontrol() {
         if (toggle == true) {
             intake.move(20);
         }
-        
-		//pros::lcd::print(4, "X: %f", chassis.getPose().x); // x
-        //pros::lcd::print(5, "Y: %f", chassis.getPose().y); // y
-        //pros::lcd::print(6, "Theta: %f", chassis.getPose().theta); // heading
-        //pros::lcd::print(3, "uptime: %f", uptime); // uptime
-        //uptime = uptime + 1;
-
-        //why does this crash the brain what
 	
         int leftY = master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
 		int rightX = master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
